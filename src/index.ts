@@ -33,20 +33,23 @@ async function getFinalUrl(url: string) {
 
 async function redirect(url: string, redirects: string[]): Promise<string | undefined> {
   try {
+    if (url.startsWith('/')) return redirects[redirects.length - 2]
     const resp = await axios.request({
       url,
       maxRedirects: 0,
-      validateStatus: (status) => status === 200 || (status >= 300 && status < 400),
+      validateStatus: (status) => status === 200 || (status >= 300 && status < 400) || status === 403,
       headers: {
         'Accept-Encoding': 'gzip, deflate, compress'
       }
     })
-    if (resp.status === 200) {
-      if (redirects.length > 1 && url.includes('VerifyHuman')) {
-        return redirects[redirects.length - 2] //
-      } else {
-        return url
+    if (resp.status === 200 || resp.status === 403) {
+      const parsedUrl = new URL(url)
+      if (url.includes('kr.revolve.com/VerifyHuman.jsp')) {
+        return parsedUrl.hostname.concat(parsedUrl.searchParams.get('url') || '')
+      } else if (parsedUrl.hostname === 'www.shareasale-analytics.com' && parsedUrl.searchParams.get('urllink') !== null) {
+        return parsedUrl.searchParams.get('urllink') || undefined
       }
+      return url
     } else {
       if (resp.headers['location'] && url !== resp.headers['location']) { // 무한루프 방지
         redirects.push(resp.headers['location'])
@@ -69,6 +72,6 @@ export {
 }
 
 (async () => {
-  const result = await handler('https://www.shopltk.com/explore/beautyprofessor/posts/268824ea-7a92-11ed-9120-0242ac110003')
+  const result = await handler('https://www.shopltk.com/explore/TiaBooth/giftguides/11ed56efdc39ba5c808a0242ac110002')
   console.log(result)
 })()
