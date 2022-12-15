@@ -48,7 +48,9 @@ async function redirect(url: string, redirects: string[]): Promise<string | unde
         return parsedUrl.hostname.concat(parsedUrl.searchParams.get('url') || '')
       } else if (parsedUrl.hostname === 'www.shareasale-analytics.com' && parsedUrl.searchParams.get('urllink') !== null) {
         return parsedUrl.searchParams.get('urllink') || undefined
-      }
+      } else if (parsedUrl.hostname === 'click.linksynergy.com' && parsedUrl.searchParams.get('murl') !== null) {
+        return parsedUrl.searchParams.get('murl') || undefined
+      } 
       return url
     } else {
       if (resp.headers['location'] && url !== resp.headers['location']) { // 무한루프 방지
@@ -72,6 +74,6 @@ export {
 }
 
 (async () => {
-  const result = await handler('https://www.shopltk.com/explore/TiaBooth/giftguides/11ed56efdc39ba5c808a0242ac110002')
+  const result = await handler('https://www.shopltk.com/explore/alexa.anglin/giftguides/11ed5f92d19a2e9e87410242ac110002')
   console.log(result)
 })()
