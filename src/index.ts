@@ -46,11 +46,16 @@ async function redirect(url: string, redirects: string[]): Promise<string | unde
       const parsedUrl = new URL(url)
       if (url.includes('kr.revolve.com/VerifyHuman.jsp')) {
         return parsedUrl.hostname.concat(parsedUrl.searchParams.get('url') || '')
-      } else if (parsedUrl.hostname === 'www.shareasale-analytics.com' && parsedUrl.searchParams.get('urllink') !== null) {
+      } else if (parsedUrl.hostname.includes('shareasale') && parsedUrl.searchParams.get('urllink') !== null) {
         return parsedUrl.searchParams.get('urllink') || undefined
       } else if (parsedUrl.hostname === 'click.linksynergy.com' && parsedUrl.searchParams.get('murl') !== null) {
         return parsedUrl.searchParams.get('murl') || undefined
-      } 
+      } else if (parsedUrl.hostname === 'www.neimanmarcus.com' && parsedUrl.searchParams.get('url') !== null) {
+        return parsedUrl.searchParams.get('url') || undefined
+      } else if (parsedUrl.hostname === 'oldnavy.gap.com' && parsedUrl.pathname === '/CookieFailure.do') {
+        parsedUrl.pathname = '/browse/product.do'
+        return parsedUrl.href
+      }
       return url
     } else {
       if (resp.headers['location'] && url !== resp.headers['location']) { // 무한루프 방지
@@ -74,6 +79,6 @@ export {
 }
 
 (async () => {
-  const result = await handler('https://www.shopltk.com/explore/alexa.anglin/giftguides/11ed5f92d19a2e9e87410242ac110002')
+  const result = await handler('https://www.shopltk.com/explore/mytexashouse/posts/47ea1129-7bf5-11ed-a127-0242ac110004')
   console.log(result)
 })()
