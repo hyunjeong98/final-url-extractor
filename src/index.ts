@@ -78,10 +78,6 @@ async function redirect(url: string, redirects: string[]): Promise<string | unde
   }
 }
 
-function delay(ms: number) {
-  return new Promise<void>(resolve => setTimeout(resolve, ms))
-}
-
 export {
   handler
 }
