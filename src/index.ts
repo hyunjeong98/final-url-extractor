@@ -6,17 +6,25 @@ async function handler(url: string) {
   const $ = load(resp.data)
   const urlObj = new URL(url)
   const type = urlObj.pathname.split('/')[3]
+  const result = []
 
   switch (type) {
     case 'posts':
-      return await Promise.all($('div.ltk-product.pa-1 a').toArray().map((elem) => $(elem).attr('href'))
-        .map(async (elem) => await getFinalUrl(elem || '')))
+      for (const url of $('div.ltk-product.pa-1 a').toArray().map((elem) => $(elem).attr('href'))) {
+        const finalUrl = await getFinalUrl(url || '')
+        if (finalUrl) result.push(finalUrl)
+      }
+      break
     case 'giftguides':
-      return await Promise.all($('div.pa-1 a').toArray().map((elem) => $(elem).attr('href'))
-        .map(async (elem) => await getFinalUrl(elem || '')))
+      for (const url of $('div.pa-1 a').toArray().map((elem) => $(elem).attr('href'))) {
+        const finalUrl = await getFinalUrl(url || '')
+        if (finalUrl) result.push(finalUrl)
+      }
+      break
     default:
-      return []
+      break
   }
+  return result
 }
 
 async function getFinalUrl(url: string) {
@@ -27,7 +35,7 @@ async function getFinalUrl(url: string) {
       return await redirect(refreshUrl, [])
     }
   } catch (error) {
-    return (error as unknown as AxiosError).message
+    console.log(`${(error as unknown as AxiosError).message} - request url: ${url}`)
   }
 }
 
@@ -66,7 +74,7 @@ async function redirect(url: string, redirects: string[]): Promise<string | unde
       }
     }
   } catch (error) {
-    return (error as unknown as AxiosError).message
+    console.log(`${(error as unknown as AxiosError).message} - request url: ${url}`)
   }
 }
 
